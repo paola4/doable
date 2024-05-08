@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@jaames/iro": "^5.5.2",
+    "date-fns": "^3.6.0",
     "lodash": "^4.17.21",
     "picmo": "^5.8.5"
   }

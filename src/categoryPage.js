@@ -1,6 +1,5 @@
-// Create a single page view for each category object
-// It should include the category name at the top
-// Followed by the list of tasks
+// Description: This file contains the logic for rendering the category page.
+import { compareAsc, format } from "date-fns";
 
 function categoryPage(category) {
   const page = document.createElement("div");
@@ -138,9 +137,17 @@ function renderTaskModal(category) {
     const description = document.querySelector("#description").value;
     const setDate = document.querySelector("#set-date").value;
     const dueDate = document.querySelector("#due-date").value;
-    const priority = document.querySelector("#priority").value;
+    const priority = document.querySelector(
+      'input[name="priority"]:checked'
+    ).value;
     const notes = document.querySelector("#notes").value;
-    const checklist = document.querySelector("#checklist").value;
+
+    // Get checklist values
+    const checklistItems = document.querySelectorAll(
+      "#checklist input[type='text']"
+    );
+    const checklist = Array.from(checklistItems).map((item) => item.value);
+    console.log("Checklist", checklist);
 
     const task = createTask(title);
     task.description = description;
@@ -231,9 +238,21 @@ function createSetDateInput() {
 
   const inputBox = document.createElement("input");
   inputBox.id = "set-date";
-  inputBox.type = "text";
+  inputBox.type = "date";
   inputBox.placeholder = "Set Date";
   inputBox.classList.add("input-box");
+
+  // Get current date
+  const currentDate = new Date();
+
+  // Format date to "yyyy-mm-dd"
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are 0-based, so add 1 and pad with 0 if necessary
+  const day = String(currentDate.getDate()).padStart(2, "0"); // Pad with 0 if necessary
+
+  // Set the default value of the date input to the current date
+  inputBox.value = `${year}-${month}-${day}`;
+
   inputContainer.appendChild(inputBox);
 
   return inputContainer;
@@ -250,7 +269,7 @@ function createDueDateInput() {
 
   const inputBox = document.createElement("input");
   inputBox.id = "due-date";
-  inputBox.type = "text";
+  inputBox.type = "date";
   inputBox.placeholder = "Due Date";
   inputBox.classList.add("input-box");
   inputContainer.appendChild(inputBox);
@@ -267,12 +286,25 @@ function createPriorityInput() {
   label.classList.add("input-label");
   inputContainer.appendChild(label);
 
-  const inputBox = document.createElement("input");
-  inputBox.id = "priority";
-  inputBox.type = "text";
-  inputBox.placeholder = "Priority";
-  inputBox.classList.add("input-box");
-  inputContainer.appendChild(inputBox);
+  // Create four radio buttons, 1 through 4, for the different priorities
+  const priorities = ["1", "2", "3", "4"];
+  priorities.forEach((priority) => {
+    const input = document.createElement("input");
+    input.id = priority;
+    input.type = "radio";
+    input.name = "priority";
+    input.value = priority;
+
+    if (priority === "1") {
+      input.checked = true;
+    }
+
+    inputContainer.appendChild(input);
+
+    const label = document.createElement("label");
+    label.textContent = priority;
+    inputContainer.appendChild(label);
+  });
 
   return inputContainer;
 }
@@ -299,18 +331,34 @@ function createNotesInput() {
 function createChecklistInput() {
   const inputContainer = document.createElement("div");
   inputContainer.classList.add("input-container");
+  inputContainer.id = "checklist";
 
   const label = document.createElement("label");
   label.textContent = "Checklist";
   label.classList.add("input-label");
   inputContainer.appendChild(label);
 
-  const inputBox = document.createElement("input");
-  inputBox.id = "checklist";
-  inputBox.type = "text";
-  inputBox.placeholder = "Checklist";
-  inputBox.classList.add("input-box");
-  inputContainer.appendChild(inputBox);
+  const addButton = document.createElement("button");
+  addButton.textContent = "Add a new subtask";
+  inputContainer.appendChild(addButton);
+
+  addButton.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    const subtaskContainer = document.createElement("div");
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    subtaskContainer.appendChild(checkbox);
+
+    const inputBox = document.createElement("input");
+    inputBox.type = "text";
+    inputBox.placeholder = "Subtask";
+    inputBox.classList.add("input-box");
+    subtaskContainer.appendChild(inputBox);
+
+    inputContainer.insertBefore(subtaskContainer, addButton);
+  });
 
   return inputContainer;
 }
