@@ -1,61 +1,73 @@
-// This is a menu with the different "to do" categories that the user created
-// It is displayed on the left side of the screen
-// It should be initiated with a single category "General" until the user adds their own additional ones
-// The user can add a new category by clicking the "+" button
-// The user can delete a category by hovering on each category and clicking the "x" button
-// The user can switch between categories by clicking on them
+// Description: This file contains the code for the left menu, which displays the categories and allows users to add new categories.
 
 import { add } from "lodash";
-import renderModal from "./categoryModal";
+import addCategoryModal from "./categoryModal";
 import categoryPage from "./categoryPage";
+import renderInstructions from "./instructions";
+import {
+  displayCategories,
+  getCategory,
+  loadCategories,
+  createCategory,
+} from "./categoryManager";
 
 function leftMenu() {
+  const userName = localStorage.getItem("userName") || "User";
+  const menu = document.createElement("div");
+  menu.classList.add("menu");
+  const menuHeader = document.createElement("div");
+  menuHeader.classList.add("menu-header");
+  menuHeader.innerHTML = `
+        <div class="logo">
+        <i class="ph-bold ph-check-square"></i>
+        <span>Doable</span>
+    </div>
+    `;
   const leftMenu = document.createElement("div");
   leftMenu.classList.add("left-menu");
 
-  // Display Heading
-  const heading = document.createElement("span");
-  heading.classList.add("categories-heading");
-  heading.textContent = "Categories";
-  leftMenu.appendChild(heading);
+  leftMenu.innerHTML = `
+    <div class="top-menu">
+      <span class="categories-heading">Categories</span>
+      <div class="categories"></div>
+      <button class="add-category">Add New Category</button>
+    </div>
+  `;
 
-  // Display categories
-  const categories = document.createElement("div");
+  const userBanner = document.createElement("div");
+  userBanner.classList.add("user-banner");
+  userBanner.innerHTML = `
+        <i class="ph-light ph-user-circle user-icon"></i>
+        <span>${userName}'s Dashboard</span>`;
 
-  // On first load only, create a default category called "General"
-  if (loadCategories().length === 0) {
-    const general = createCategory("General");
-    general.icon = "📝";
-    general.color = "rgb(255, 255, 255)";
+  menu.appendChild(menuHeader);
+  menu.appendChild(leftMenu);
+  menu.appendChild(userBanner);
 
-    const categories = loadCategories();
-    categories.push(general);
-    localStorage.setItem("categories", JSON.stringify(categories));
-  }
+  const categoriesDiv = leftMenu.querySelector(".categories");
+  categoriesDiv.id = "categories";
+  const addCategoryButton = leftMenu.querySelector(".add-category");
+  const instructionsLink = leftMenu.querySelector(".link");
 
-  displayCategories(categories);
-  leftMenu.appendChild(categories);
+  displayCategories(categoriesDiv);
+  addNewCategory(addCategoryButton, categoriesDiv);
+  checkCategoryClick(categoriesDiv);
 
-  // Display Add Category Button
-  const addCategory = document.createElement("button");
-  addCategory.classList.add("add-category");
-  addCategory.textContent = "+";
-  leftMenu.appendChild(addCategory);
-
-  addNewCategory(addCategory, categories);
-  checkCategoryClick(categories);
-  // CHeck if a category has been clicked, and if so, display the tasks for that category in the main view
-  //   categories.addEventListener("click", (e) => {
-  //     const category = e.target.closest(".category");
-  //     if (category) {
-  //       console.log("Category clicked", category.textContent);
-  //     }
-  //   });
-
-  return leftMenu;
+  return menu;
 }
 export default leftMenu;
 
+function createLogo() {
+  const logo = document.createElement("div");
+  logo.classList.add("logo");
+  const logoIcon = document.createElement("i");
+  logoIcon.classList.add("ph-bold", "ph-check-square");
+  logo.appendChild(logoIcon);
+  const logoText = document.createElement("span");
+  logoText.textContent = "Doable";
+  logo.appendChild(logoText);
+  return logo;
+}
 function checkCategoryClick(categories) {
   categories.addEventListener("click", (e) => {
     const category = e.target.closest(".category");
@@ -80,104 +92,6 @@ function addNewCategory(addButton, parent) {
   addButton.addEventListener("click", () => {
     console.log("Add new category");
     const modal = addCategoryModal(parent);
-    document.body.appendChild(modal);
+    document.querySelector(".main-view").appendChild(modal);
   });
-}
-
-// Display a modal to add a new category
-// Users enter a name, and select an icon and color for the new category
-function addCategoryModal(parent) {
-  const modal = renderModal();
-
-  const closeButton = modal.querySelector(".close");
-  closeButton.addEventListener("click", () => {
-    modal.style.display = "none";
-  });
-
-  const addCategoryButton = modal.querySelector(".add-category");
-  const categoryInput = modal.querySelector(
-    "input[placeholder='Category Name']"
-  );
-
-  // On click or enter, create a new category object and save it to local storage
-  categoryInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      handleAddCategory(modal, parent);
-    }
-  });
-
-  addCategoryButton.addEventListener("click", () => {
-    handleAddCategory(modal, parent);
-  });
-
-  return modal;
-}
-
-function handleAddCategory(modal, parent) {
-  const name = modal.querySelector("input[placeholder='Category Name']").value;
-  const icon = modal.querySelector(".emoji-root").innerHTML.toString();
-  const color = modal
-    .querySelector(".current-color")
-    .style.backgroundColor.toString();
-
-  console.log("New Category", name, icon, color);
-  const newCategory = createCategory(name);
-  newCategory.icon = icon;
-  newCategory.color = color;
-
-  if (newCategory) {
-    const categories = loadCategories();
-    categories.push(newCategory);
-    localStorage.setItem("categories", JSON.stringify(categories));
-    console.log(categories);
-    parent.appendChild(
-      getCategory(newCategory.name, newCategory.icon, newCategory.color)
-    );
-    modal.style.display = "none";
-  }
-
-  return modal;
-}
-// Display categories from local storage
-function displayCategories(parent) {
-  loadCategories().forEach((category) => {
-    parent.appendChild(
-      getCategory(category.name, category.icon, category.color)
-    );
-  });
-}
-
-// Load categories from local storage
-function loadCategories() {
-  const categories = JSON.parse(localStorage.getItem("categories"));
-  if (categories) {
-    return categories;
-  }
-  console.log(categories);
-  return [];
-}
-
-// Create a new category
-function getCategory(name, icon, color) {
-  const category = document.createElement("div");
-  category.classList.add("category");
-  category.id = name;
-  const categoryIcon = document.createElement("span");
-  categoryIcon.innerHTML = icon;
-  category.appendChild(categoryIcon);
-
-  const categoryName = document.createElement("span");
-  categoryName.textContent = name;
-  category.appendChild(categoryName);
-  return category;
-}
-
-// Create a new category object with a name, array of todo tasks, icon and color
-function createCategory(name) {
-  return {
-    name,
-    tasks: [],
-    icon: "",
-    color: "",
-  };
 }

@@ -1,6 +1,73 @@
 import { createPicker } from "picmo";
 import iro from "@jaames/iro";
 import { initial } from "lodash";
+import { getCategory, createCategory, loadCategories } from "./categoryManager";
+import { createInputContainer } from "./helpers";
+
+function createElement(tag, className, properties = {}) {
+  const element = document.createElement(tag);
+  element.classList.add(className);
+  Object.assign(element, properties);
+  return element;
+}
+
+function appendChildren(parent, children) {
+  children.forEach((child) => parent.appendChild(child));
+}
+// Display a modal to add a new category
+// Users enter a name, and select an icon and color for the new category
+function addCategoryModal(parent) {
+  const modal = renderModal();
+
+  const closeButton = modal.querySelector(".close");
+  closeButton.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+
+  const addCategoryButton = modal.querySelector(".add-category");
+  const categoryInput = modal.querySelector(
+    "input[placeholder='Category Name']"
+  );
+
+  // On click or enter, create a new category object and save it to local storage
+  categoryInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      handleAddCategory(modal, parent);
+    }
+  });
+
+  addCategoryButton.addEventListener("click", () => {
+    handleAddCategory(modal, parent);
+  });
+
+  return modal;
+}
+
+function handleAddCategory(modal, parent) {
+  const name = modal.querySelector("input[placeholder='Category Name']").value;
+  const icon = modal.querySelector(".emoji-root").innerHTML.toString();
+  const color = modal
+    .querySelector(".current-color")
+    .style.backgroundColor.toString();
+
+  console.log("New Category", name, icon, color);
+  const newCategory = createCategory(name);
+  newCategory.icon = icon;
+  newCategory.color = color;
+
+  if (newCategory) {
+    const categories = loadCategories();
+    categories.push(newCategory);
+    localStorage.setItem("categories", JSON.stringify(categories));
+    console.log(categories);
+    parent.appendChild(
+      getCategory(newCategory.name, newCategory.icon, newCategory.color)
+    );
+    modal.style.display = "none";
+  }
+
+  return modal;
+}
 
 function renderModal() {
   console.log("In the modal");
@@ -15,52 +82,38 @@ function renderModal() {
   close.classList.add("close");
   close.innerHTML = "&times;";
 
-  modalContent.appendChild(close);
   const h2 = document.createElement("h2");
   h2.textContent = "Add Category";
-  modalContent.appendChild(h2);
 
-  modalContent.appendChild(createNameInput());
-  modalContent.appendChild(createIconInput());
-  modalContent.appendChild(createColorInput());
+  const inputContainer = document.createElement("div");
+  inputContainer.classList.add("add-category-modal-inputs");
+  const nameInput = createInputContainer("Category Name", createNameInput());
+  const iconInput = createInputContainer("Icon", createIconInput());
+  const colorInput = createInputContainer("Color", createColorInput());
+  inputContainer.append(nameInput, iconInput, colorInput);
 
   const addButton = document.createElement("button");
   addButton.classList.add("add-category");
   addButton.textContent = "Add Category";
-  modalContent.appendChild(addButton);
+
+  appendChildren(modalContent, [close, h2, inputContainer, addButton]);
 
   modal.appendChild(modalContent);
 
   return modal;
 }
-export default renderModal;
+export default addCategoryModal;
 
 function createNameInput() {
-  const inputContainer = document.createElement("div");
-  inputContainer.classList.add("input-container");
-
-  const label = document.createElement("label");
-  label.textContent = "Category Name";
-  label.classList.add("input-label");
-  inputContainer.appendChild(label);
-
-  const inputBox = document.createElement("input");
-  inputBox.type = "text";
-  inputBox.placeholder = "Category Name";
-  inputBox.classList.add("input-box");
-  inputContainer.appendChild(inputBox);
-
-  return inputContainer;
+  return createElement("input", "input-box", {
+    type: "text",
+    placeholder: "Category Name",
+  });
 }
 
 function createIconInput() {
   const inputContainer = document.createElement("div");
   inputContainer.classList.add("input-container");
-
-  const label = document.createElement("label");
-  label.textContent = "Icon";
-  label.classList.add("input-label");
-  inputContainer.appendChild(label);
 
   const emojiRoot = document.createElement("div");
   emojiRoot.classList.add("emoji-root");
@@ -95,11 +148,6 @@ function emojiPicker(emojiRoot) {
 function createColorInput() {
   const inputContainer = document.createElement("div");
   inputContainer.classList.add("input-container");
-
-  const label = document.createElement("label");
-  label.textContent = "Color";
-  label.classList.add("input-label");
-  inputContainer.appendChild(label);
 
   const currentColor = document.createElement("div");
   currentColor.classList.add("current-color");
