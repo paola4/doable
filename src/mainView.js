@@ -1,20 +1,17 @@
 import landing from "./landing.js";
 import navBar from "./navBar.js";
+import "./styles/mainView.css";
 
 function mainView() {
   initiateToDo();
 
   const mainView = document.createElement("div");
   mainView.classList.add("main-view");
-  mainView.appendChild(navBar());
+  // mainView.appendChild(navBar());
   const page = document.createElement("div");
   page.classList.add("category-page");
   page.appendChild(getGreeting());
   page.appendChild(landing(getUserName()));
-
-  //   const mainViewContent = document.createElement("div");
-  //   mainViewContent.classList.add("main-view-content");
-  //   page.appendChild(mainViewContent);
 
   mainView.appendChild(page);
 
@@ -89,14 +86,14 @@ function renderWelcomeModal() {
 
   const inputBox = document.createElement("input");
   inputBox.type = "text";
-  inputBox.placeholder = "Your Name";
+  inputBox.placeholder = "My name is ... ";
   inputBox.classList.add("input-box");
   inputContainer.appendChild(inputBox);
 
   modalContent.appendChild(inputContainer);
 
   const addButton = document.createElement("button");
-  addButton.classList.add("add-category");
+  addButton.classList.add("add-category", "tertiary");
   addButton.textContent = "Let's Go!";
   modalContent.appendChild(addButton);
 
@@ -104,12 +101,25 @@ function renderWelcomeModal() {
 
   document.body.appendChild(modal);
 
-  addButton.addEventListener("click", () => {
+  // Function to handle the submission
+  function handleSubmit() {
     const name = inputBox.value;
     setUserName(name);
     modal.style.display = "none";
     updateGreeting();
     document.querySelector(".category-page").appendChild(displayIntructions());
+  }
+
+  // Add event listener for 'click' event on the 'Add' button
+  addButton.addEventListener("click", handleSubmit);
+
+  // Add event listener for 'keydown' event on the input box
+  inputBox.addEventListener("keydown", function (event) {
+    // Check if 'Enter' key was pressed
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSubmit();
+    }
   });
 }
 
@@ -129,9 +139,8 @@ function displayIntructions() {
   }
   instructions.innerHTML = `
     <h3>Instructions</h3>
-    <p>Click on the "+" button to add a new task</p>
-    <p>Click on the "x" button to delete a task</p>
-    <p>Click on the checkbox to mark a task as complete</p>
-    <p>Click on the task text to edit the task</p>`;
+    <p>Click on "+ Add Category" to create your first category. /p>
+    <p>Click on "+ Add Task" to add a task to a category.</p>
+    <p>Click on the checkbox to mark a task as complete.</p>`;
   return instructions;
 }

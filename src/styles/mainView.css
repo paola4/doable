@@ -1,0 +1,16 @@
+.main-view {
+  position: relative;
+  background-color: white;
+  overflow-y: scroll;
+}
+
+.greeting {
+  font-size: 1.5rem;
+  font-weight: 600;
+  height: 4rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  gap: 0.5rem;
+}

@@ -9,10 +9,23 @@ function createElementWithClass(tagName, className) {
   return element;
 }
 
+// function createElement(tagName, options = {}, parent) {
+//   const element = document.createElement(tagName);
+//   if (options.class) {
+//     element.classList.add(options.class);
+//   }
+//   Object.assign(element, options);
+//   if (parent) {
+//     parent.appendChild(element);
+//   }
+//   return element;
+// }
+
 function createElement(tagName, options = {}, parent) {
   const element = document.createElement(tagName);
   if (options.class) {
-    element.classList.add(options.class);
+    element.classList.add(...options.class.split(" "));
+    delete options.class;
   }
   Object.assign(element, options);
   if (parent) {

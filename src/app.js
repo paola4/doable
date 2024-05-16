@@ -1,5 +1,7 @@
 // Handles structure and initialization of main application layout
 
+import "font-awesome/css/font-awesome.css";
+
 import navBar from "./navBar";
 import leftMenu from "./leftMenu";
 import mainView from "./mainView";

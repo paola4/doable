@@ -5,11 +5,12 @@ import { displayCategories, loadCategories } from "./categoryManager";
 import { getCategory } from "./categoryManager";
 import landing from "./landing";
 import successfulCategoryDeletion from "./successfulCategoryDeletion";
+import "./styles/categoryModal.css";
 
 function editCategoryModal(parent, category, onCategoryUpdated) {
   const modal = renderEditModal(category);
 
-  const closeButton = modal.querySelector(".close");
+  const closeButton = modal.querySelector(".close-button");
   closeButton.addEventListener("click", () => {
     modal.style.display = "none";
   });
@@ -23,7 +24,7 @@ function editCategoryModal(parent, category, onCategoryUpdated) {
   // On click or enter, update the category object and save it to local storage
   categoryInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
-      handleEditCategory(modal, parent, category);
+      handleEditCategory(modal, parent, category, onCategoryUpdated);
     }
   });
 
@@ -108,9 +109,9 @@ function renderEditModal(category) {
   const modalContent = document.createElement("div");
   modalContent.classList.add("modal-content");
 
-  const close = document.createElement("span");
-  close.classList.add("close");
-  close.innerHTML = "&times;";
+  const close = document.createElement("div");
+  close.classList.add("close-button");
+  close.innerHTML = "<i class='ph-bold ph-x'></i>";
 
   const h2 = document.createElement("h2");
   h2.textContent = "Edit Category";
@@ -119,32 +120,33 @@ function renderEditModal(category) {
     "Category Name",
     createNameInput(category.name)
   );
+  nameInput.classList.add("category-name-input");
+
   const iconInput = createInputContainer(
     "Icon",
     createIconInput(category.icon)
   );
+  iconInput.classList.add("category-icon-input");
+
   const colorInput = createInputContainer(
     "Color",
     createColorInput(category.color)
   );
+  colorInput.classList.add("category-color-input");
+
+  const inputs = document.createElement("div");
+  inputs.classList.add("add-category-modal-inputs");
+  appendChildren(inputs, [nameInput, iconInput, colorInput]);
 
   const editButton = document.createElement("button");
-  editButton.classList.add("edit-category");
+  editButton.classList.add("edit-category", "primary");
   editButton.textContent = "Edit Category";
 
   const deleteButton = document.createElement("button");
-  deleteButton.classList.add("delete-category");
+  deleteButton.classList.add("delete-category", "primary");
   deleteButton.textContent = "Delete Category";
 
-  appendChildren(modalContent, [
-    close,
-    h2,
-    nameInput,
-    iconInput,
-    colorInput,
-    editButton,
-    deleteButton,
-  ]);
+  appendChildren(modalContent, [close, h2, inputs, editButton, deleteButton]);
 
   modal.appendChild(modalContent);
 
@@ -164,11 +166,6 @@ function createIconInput(initialValue) {
   const inputContainer = document.createElement("div");
   inputContainer.classList.add("input-container");
 
-  const label = document.createElement("label");
-  label.textContent = "Icon";
-  label.classList.add("input-label");
-  inputContainer.appendChild(label);
-
   const emojiRoot = document.createElement("div");
   emojiRoot.classList.add("emoji-root");
   emojiRoot.innerHTML = initialValue;
@@ -181,15 +178,26 @@ function createIconInput(initialValue) {
   inputContainer.appendChild(emojiRoot);
   return inputContainer;
 }
+function emojiPicker(emojiRoot) {
+  const rootElement = document.createElement("div");
+  rootElement.classList.add("emoji-picker");
+  document.body.appendChild(rootElement);
+  const picker = createPicker({ rootElement });
+
+  let emoji = "";
+  picker.addEventListener("emoji:select", (event) => {
+    emoji = event.emoji;
+    console.log("Emoji selected:", emoji);
+    if (emoji) {
+      rootElement.style.display = "none";
+      emojiRoot.innerHTML = emoji.toString();
+    }
+  });
+}
 
 function createColorInput(initialValue) {
   const inputContainer = document.createElement("div");
   inputContainer.classList.add("input-container");
-
-  const label = document.createElement("label");
-  label.textContent = "Color";
-  label.classList.add("input-label");
-  inputContainer.appendChild(label);
 
   const currentColor = document.createElement("div");
   currentColor.classList.add("current-color");
@@ -207,3 +215,45 @@ function createColorInput(initialValue) {
 }
 
 export default editCategoryModal;
+
+function colorPickerModal(currentColorElement, initialColor) {
+  const colorPickerModalWrapper = document.createElement("div");
+  colorPickerModalWrapper.classList.add("color-picker-modal-wrapper");
+
+  const colorPickerModal = document.createElement("div");
+  colorPickerModal.classList.add("color-picker-modal");
+
+  const close = document.createElement("div");
+  close.classList.add("close-button");
+  close.innerHTML = "<i class='ph-bold ph-x'></i>";
+
+  close.addEventListener("click", () => {
+    colorPickerModal.style.display = "none";
+    colorPickerModalWrapper.style.display = "none";
+  });
+  colorPickerModal.appendChild(close);
+
+  const colorPickerContainer = document.createElement("div");
+  let colorPicker = new iro.ColorPicker(colorPickerContainer, {
+    width: 150,
+    color: initialColor,
+  });
+
+  colorPicker.on("color:change", (color) => {
+    console.log("Color changed:", color.hexString);
+    initialColor = color.hexString;
+    currentColorElement.style.backgroundColor = color.hexString;
+  });
+
+  colorPickerModal.appendChild(colorPickerContainer);
+  const submitButton = document.createElement("button");
+  submitButton.textContent = "Select";
+  submitButton.addEventListener("click", () => {
+    colorPickerModal.style.display = "none";
+    colorPickerModalWrapper.style.display = "none";
+  });
+  colorPickerModal.appendChild(submitButton);
+
+  colorPickerModalWrapper.appendChild(colorPickerModal);
+  document.body.appendChild(colorPickerModalWrapper);
+}

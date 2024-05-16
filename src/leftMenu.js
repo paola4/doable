@@ -1,6 +1,7 @@
 // Description: This file contains the code for the left menu, which displays the categories and allows users to add new categories.
 
-import { add } from "lodash";
+import "./styles/leftMenu.css";
+
 import addCategoryModal from "./categoryModal";
 import categoryPage from "./categoryPage";
 import renderInstructions from "./instructions";
@@ -30,7 +31,7 @@ function leftMenu() {
     <div class="top-menu">
       <span class="categories-heading">Categories</span>
       <div class="categories"></div>
-      <button class="add-category">Add New Category</button>
+      <button class="add-new-category "><i class="ph-bold ph-plus"></i>&nbsp;Add Category</button>
     </div>
   `;
 
@@ -46,7 +47,7 @@ function leftMenu() {
 
   const categoriesDiv = leftMenu.querySelector(".categories");
   categoriesDiv.id = "categories";
-  const addCategoryButton = leftMenu.querySelector(".add-category");
+  const addCategoryButton = leftMenu.querySelector(".add-new-category");
   const instructionsLink = leftMenu.querySelector(".link");
 
   displayCategories(categoriesDiv);
@@ -72,6 +73,13 @@ function checkCategoryClick(categories) {
   categories.addEventListener("click", (e) => {
     const category = e.target.closest(".category");
     if (category) {
+      // Remove the 'category-selected' class from all categories
+      const allCategories = categories.querySelectorAll(".category");
+      allCategories.forEach((cat) => cat.classList.remove("category-selected"));
+
+      // Add the 'category-selected' class to the clicked category
+      category.classList.add("category-selected");
+
       console.log("Category clicked", category.textContent);
 
       const mainView = document.querySelector(".main-view");

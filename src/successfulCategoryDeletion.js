@@ -9,9 +9,9 @@ function successfulCategoryDeletion() {
   const modalContent = document.createElement("div");
   modalContent.classList.add("modal-content", "delete-category-success");
 
-  const close = document.createElement("span");
-  close.classList.add("close");
-  close.innerHTML = "&times;";
+  const close = document.createElement("div");
+  close.classList.add("close-button");
+  close.innerHTML = "<i class='ph-bold ph-x'></i>";
 
   const h2 = document.createElement("h2");
   h2.textContent = "Category Deleted";

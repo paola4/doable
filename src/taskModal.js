@@ -1,22 +1,17 @@
+import "./styles/taskModal.css";
 import { createTask } from "./task";
 import { updateLocalStorage } from "./categoryManager.js";
 import { renderSingleTask } from "./tasksHelper.js";
 import { createElementWithContent, createModal } from "./helpers.js";
-
-function createInputFields(modalContent) {
-  createElementWithContent("h2", "Add Task", modalContent);
-
-  modalContent.appendChild(createTitleInput());
-  modalContent.appendChild(createSetDateInput());
-  modalContent.appendChild(createDescriptionInput());
-  modalContent.appendChild(createDueDateInput());
-  modalContent.appendChild(createPriorityInput());
-  modalContent.appendChild(createNotesInput());
-  modalContent.appendChild(createChecklistInput());
-}
+import { showModal } from "./warningModal.js";
 
 function handleAddTaskButtonClick(addButton, modal, category) {
   addButton.addEventListener("click", () => {
+    const title = document.querySelector("#title").value;
+    if (!title.trim()) {
+      showModal("Title is required");
+      return;
+    }
     const task = createTaskFromInputFields();
     category.tasks.push(task);
     updateLocalStorage(category);
@@ -52,17 +47,20 @@ function createTaskFromInputFields() {
 
 function renderTaskModal(category) {
   const { modal, modalContent } = createModal();
+  modalContent.id = "task-modal";
 
-  const closeAddTask = createElementWithContent(
-    "span",
-    "&times;",
-    modalContent,
-    "close-add-task",
-    true
-  );
-  closeAddTask.addEventListener("click", () => modal.remove());
+  const close = document.createElement("div");
+  close.classList.add("close-button");
+  close.innerHTML = "<i class='ph-bold ph-x'></i>";
+  modalContent.appendChild(close);
+  close.addEventListener("click", () => modal.remove());
 
-  createInputFields(modalContent);
+  createElementWithContent("h2", "Add Task", modalContent);
+  const contentWrapper = document.createElement("div");
+  contentWrapper.classList.add("content-wrapper");
+  createInputFields(contentWrapper);
+
+  modalContent.appendChild(contentWrapper);
 
   const addButton = createElementWithContent(
     "button",
@@ -70,6 +68,8 @@ function renderTaskModal(category) {
     modalContent,
     "add-task"
   );
+  addButton.classList.add("primary");
+
   handleAddTaskButtonClick(addButton, modal, category);
 
   document.querySelector(".main-view").appendChild(modal);
@@ -79,13 +79,24 @@ function renderTaskModal(category) {
 
 export default renderTaskModal;
 
+function createInputFields(parent) {
+  parent.appendChild(createTitleInput());
+  parent.appendChild(createSetDateInput());
+  parent.appendChild(createDescriptionInput());
+  parent.appendChild(createDueDateInput());
+  parent.appendChild(createPriorityInput());
+  parent.appendChild(createNotesInput());
+  parent.appendChild(createChecklistInput());
+}
+
 function createInputContainer(
   labelText,
   inputType,
   inputId,
   placeholder,
   rows = null,
-  value = null
+  value = null,
+  flexible = false
 ) {
   const inputContainer = document.createElement("div");
   inputContainer.classList.add("input-container");
@@ -103,8 +114,17 @@ function createInputContainer(
   inputBox.placeholder = placeholder;
   inputBox.classList.add("input-box");
   if (rows) inputBox.rows = rows;
+  if (flexible) {
+    const limit = 250;
+    inputBox.oninput = function () {
+      inputBox.style.height = "";
+      inputBox.style.height = Math.min(inputBox.scrollHeight, limit) + "px";
+    };
+    inputBox.classList.add("input-box");
+  }
   if (value) inputBox.value = value;
   inputContainer.appendChild(inputBox);
+  inputContainer.id = inputId + "-container";
 
   return inputContainer;
 }
@@ -119,7 +139,9 @@ function createDescriptionInput() {
     "textarea",
     "description",
     "Description",
-    4
+    8,
+    null,
+    true
   );
 }
 
@@ -151,7 +173,7 @@ function createDueDateInput() {
 function createPriorityInput() {
   const inputContainer = document.createElement("div");
   inputContainer.classList.add("input-container");
-  inputContainer.id = "priority";
+  inputContainer.id = "priority-container";
 
   const label = document.createElement("h4");
   label.textContent = "Priority";
@@ -197,6 +219,7 @@ function createNotesInput() {
   inputBox.placeholder = "Notes";
   inputBox.classList.add("input-box");
   inputContainer.appendChild(inputBox);
+  inputContainer.id = "notes-container";
 
   return inputContainer;
 }
@@ -204,7 +227,7 @@ function createNotesInput() {
 function createChecklistInput() {
   const inputContainer = document.createElement("div");
   inputContainer.classList.add("input-container");
-  inputContainer.id = "checklist";
+  inputContainer.id = "checklist-container";
 
   const label = document.createElement("label");
   label.textContent = "Checklist";
@@ -212,7 +235,7 @@ function createChecklistInput() {
   inputContainer.appendChild(label);
 
   const addButton = document.createElement("button");
-  addButton.textContent = "Add a new subtask";
+  addButton.innerHTML = `<i class="ph-bold ph-plus"></i>&nbsp;Add Subtask`;
   inputContainer.appendChild(addButton);
 
   addButton.addEventListener("click", (e) => {
@@ -223,6 +246,7 @@ function createChecklistInput() {
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
+    checkbox.classList.add("checkbox");
     subtaskContainer.appendChild(checkbox);
 
     const inputBox = document.createElement("textarea");
@@ -237,6 +261,10 @@ function createChecklistInput() {
     subtaskContainer.appendChild(inputBox);
 
     inputContainer.insertBefore(subtaskContainer, addButton);
+
+    // Scroll to the bottom of the contentWrapper
+    const contentWrapper = document.querySelector(".content-wrapper");
+    contentWrapper.scrollTop = contentWrapper.scrollHeight;
   });
 
   return inputContainer;

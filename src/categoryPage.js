@@ -2,6 +2,7 @@
 
 // TODO
 // If they select 'Edit Task' button, open the task modal with the task details
+import "./styles/category.css";
 
 import {
   createElementWithClass,
@@ -39,10 +40,16 @@ function categoryPage(category) {
 
   const heading = createElement("div", { className: "category-heading" }, page);
 
+  const categoryHeadingGroup = createElement(
+    "div",
+    { className: "category-heading-group" },
+    heading
+  );
+
   const categoryHeadingTitle = createElement(
     "div",
     { className: "category-heading-title" },
-    heading
+    categoryHeadingGroup
   );
 
   const icon = createElement(
@@ -58,9 +65,9 @@ function categoryPage(category) {
   );
 
   const editIcon = createElement(
-    "span",
-    { innerHTML: `<i class="ph-thin ph-pencil"></i>` },
-    categoryHeadingTitle
+    "button",
+    { innerHTML: `<i class="ph-bold ph-pencil"></i>&nbsp;Edit` },
+    categoryHeadingGroup
   );
 
   editIcon.addEventListener("click", () =>
@@ -71,10 +78,11 @@ function categoryPage(category) {
     "button",
     {
       className: "add-task",
-      innerHTML: `<i class="ph-bold ph-plus"></i> Add Task`,
+      innerHTML: `<i class="ph-bold ph-plus"></i>&nbsp;Add Task`,
     },
     heading
   );
+  // addTaskButton.classList.add("tertiary");
 
   addTaskButton.addEventListener("click", () =>
     handleAddTaskButtonClick(category)

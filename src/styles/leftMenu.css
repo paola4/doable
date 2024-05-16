@@ -1,0 +1,125 @@
+.menu {
+  display: grid;
+  background-color: var(--background-primary);
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+}
+
+.menu-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  color: #2a2a2a;
+  min-height: 2rem;
+  padding: 2rem 2rem;
+  border-right: 1px solid #000;
+
+  .logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+}
+
+.left-menu {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.8rem 2rem;
+  border-right: 1px solid #000;
+  gap: 1rem;
+
+  .links {
+    display: flex;
+    position: relative;
+    align-items: start;
+    justify-content: start;
+    padding: 10px;
+    bottom: 2rem;
+    gap: 1rem;
+  }
+  .link:hover {
+    background-color: #69f1d8;
+    cursor: pointer;
+  }
+}
+
+.categories {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.categories-heading {
+  display: flex;
+  padding-left: 0.75rem;
+  align-items: flex-start;
+  align-self: stretch;
+  flex: 1 0 0;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+}
+
+.top-menu,
+.bottom-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: fit-content;
+}
+
+.category {
+  display: flex;
+  padding: 0.5rem 0.75rem;
+  align-items: center;
+  gap: 0.75rem;
+  align-self: stretch;
+}
+
+.category:hover {
+  border-radius: 0.25rem;
+  border: 1px solid black;
+  background: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.category-selected {
+  border-radius: 0.25rem;
+  border: 1px solid black;
+  background: rgba(0, 0, 0, 0.1);
+}
+.add-new-category {
+  display: flex;
+  /* display: flex;
+  justify-content: start;
+  align-items: center;
+  padding: 10px;
+  gap: 1rem; */
+}
+/* Avatar */
+.user-banner {
+  /* background-color: #c7b9ff; */
+  background-color: black;
+  color: white;
+  padding: 0.755rem 1.75rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  border-top: 1px solid #000;
+  border-right: 1px solid #000;
+
+  i {
+    font-size: 2rem;
+  }
+}

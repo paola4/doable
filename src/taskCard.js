@@ -20,7 +20,7 @@ function createTaskCard(task, category) {
   const checkbox = createElement(
     "input",
     {
-      className: "card-checkbox",
+      className: "checkbox",
       type: "checkbox",
       checked: task.completeStatus,
     },

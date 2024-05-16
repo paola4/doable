@@ -1,3 +1,4 @@
+import "./styles/categoryModal.css";
 import { createPicker } from "picmo";
 import iro from "@jaames/iro";
 import { initial } from "lodash";
@@ -19,7 +20,7 @@ function appendChildren(parent, children) {
 function addCategoryModal(parent) {
   const modal = renderModal();
 
-  const closeButton = modal.querySelector(".close");
+  const closeButton = modal.querySelector(".close-button");
   closeButton.addEventListener("click", () => {
     modal.style.display = "none";
   });
@@ -78,9 +79,9 @@ function renderModal() {
   const modalContent = document.createElement("div");
   modalContent.classList.add("modal-content");
 
-  const close = document.createElement("span");
-  close.classList.add("close");
-  close.innerHTML = "&times;";
+  const close = document.createElement("div");
+  close.classList.add("close-button");
+  close.innerHTML = "<i class='ph-bold ph-x'></i>";
 
   const h2 = document.createElement("h2");
   h2.textContent = "Add Category";
@@ -88,12 +89,15 @@ function renderModal() {
   const inputContainer = document.createElement("div");
   inputContainer.classList.add("add-category-modal-inputs");
   const nameInput = createInputContainer("Category Name", createNameInput());
+  nameInput.classList.add("category-name-input");
   const iconInput = createInputContainer("Icon", createIconInput());
+  iconInput.classList.add("category-icon-input");
   const colorInput = createInputContainer("Color", createColorInput());
+  colorInput.classList.add("category-color-input");
   inputContainer.append(nameInput, iconInput, colorInput);
 
   const addButton = document.createElement("button");
-  addButton.classList.add("add-category");
+  addButton.classList.add("add-category", "primary");
   addButton.textContent = "Add Category";
 
   appendChildren(modalContent, [close, h2, inputContainer, addButton]);
