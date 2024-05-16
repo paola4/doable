@@ -139,7 +139,7 @@ function displayIntructions() {
   }
   instructions.innerHTML = `
     <h3>Instructions</h3>
-    <p>Click on "+ Add Category" to create your first category. /p>
+    <p>Click on "+ Add Category" to create your first category. </p>
     <p>Click on "+ Add Task" to add a task to a category.</p>
     <p>Click on the checkbox to mark a task as complete.</p>`;
   return instructions;
